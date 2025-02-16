@@ -21,5 +21,4 @@ public class Task2 implements AutoTask {
             new InstantCommand(() -> driveTrain.drive(0, 0), driveTrain)
         );
     }
-    
 }

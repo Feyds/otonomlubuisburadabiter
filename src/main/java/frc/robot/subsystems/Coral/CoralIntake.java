@@ -10,6 +10,8 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.simulation.SimulatableSparkMax;
 
@@ -47,6 +49,12 @@ public class CoralIntake extends SubsystemBase {
   public void stop() {
     intakeMotor.stopMotor();
     Logger.recordOutput("Coral Intake", "Coral Intake durduruldu.");
+  }
+
+  public class scoreCommand extends InstantCommand {
+    public scoreCommand() {
+      super(() -> CoralIntake.getInstance().score());
+    }
   }
 
   @Override

@@ -12,5 +12,4 @@ public class Task1 implements AutoTask {
     public Command getCommand() {
         return new InstantCommand(() -> driveTrain.drive(0.5, 0), driveTrain);
     }
-    
 }
