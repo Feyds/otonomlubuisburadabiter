@@ -1,12 +1,12 @@
 package frc.robot.controller;
 
-import edu.wpi.first.wpilibj.PS4Controller;
+import edu.wpi.first.wpilibj.XboxController;
 
 public class Driver {
-    PS4Controller controller;
+    XboxController controller;
 
     public Driver(int port) {
-        controller = new PS4Controller(port);
+        controller = new XboxController(port);
     }
 
     public double getSpeed() {
@@ -18,14 +18,14 @@ public class Driver {
     }
     
     public boolean getWantsToScoreCoral() {
-        return controller.getCrossButton();
+        return controller.getAButton();
     }
 
     public boolean getWantsToIntakeAlgae() {
-        return controller.getSquareButton();
+        return controller.getXButton();
     }
 
     public boolean getWantsToScoreAlgae() {
-        return controller.getCircleButton();
+        return controller.getBButton();
     }
 }

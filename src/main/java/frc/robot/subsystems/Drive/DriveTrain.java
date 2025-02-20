@@ -4,6 +4,10 @@
 
 package frc.robot.subsystems.Drive;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.json.simple.JSONObject;
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -31,6 +35,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 //import edu.wpi.first.math.geometry.Pose2d;
@@ -324,6 +329,11 @@ public Command createPathFollowingCommand(PathPlannerTrajectory trajectory) {
     Logger.recordOutput("NavX/Pitch", gyro.getPitch());
     Logger.recordOutput("NavX/Roll", gyro.getRoll());
     getAccel();
+
+    SmartDashboard.putData("SysId Quasistatic Forward", runSysIdQuasistatic(true));
+    SmartDashboard.putData("SysId Quasistatic Backward", runSysIdQuasistatic(false));
+    SmartDashboard.putData("SysId Dynamic Forward", runSysIdDynamic(true));
+    SmartDashboard.putData("SysId Dynamic Backward", runSysIdDynamic(false));
   }
 
   @Override
@@ -333,5 +343,72 @@ public Command createPathFollowingCommand(PathPlannerTrajectory trajectory) {
         rightFront.get() * RobotController.getInputVoltage()
       );
       drivetrainSim.update(0.02);
+  }
+
+
+  // SYS ID
+
+  public Command runSysIdQuasistatic(boolean forward) {
+    return new FunctionalCommand(
+      () -> {}, 
+      () -> {
+        double voltage = forward ? 1.0 : -1.0;
+        arcadeDriveVolts(voltage, voltage);
+      }, 
+      (interrupted) -> arcadeDriveVolts(0, 0), 
+      () -> false,
+       this
+    );
+  }
+
+  public Command runSysIdDynamic(boolean forward) {
+    return new FunctionalCommand(
+      () -> {}, 
+      () -> {
+        double voltage = forward ? 6.0 : -6.0;
+        arcadeDriveVolts(voltage, voltage);
+      }, 
+      (interrupted) -> arcadeDriveVolts(0, 0), 
+      () -> false, 
+      this
+      );
+  }
+
+  public void saveSysIdData() {
+    JSONObject jsonData = new JSONObject();
+    
+    JSONObject.toString("left_motor_voltage", leftFront.get());
+    JSONObject.toString("right_motor_voltage", rightFront.get());
+    JSONObject.toString("gyro_angle", gyro.getAngle());
+    JSONObject.toString("gyro_yaw", gyro.getYaw());
+    JSONObject.toString("accel_x", gyro.getWorldLinearAccelX());
+    JSONObject.toString("accel_y", gyro.getWorldLinearAccelY());
+
+    try (FileWriter file = new FileWriter(Filesystem.getDeployDirectory() + "/sysid_data.json")) {
+        file.write(jsonData.toJSONString());
+        System.out.println("SysId data saved!");
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+  }
+
+  public void runSysId() {
+    runSysIdQuasistatic(true).schedule();
+    Timer.delay(5);
+    saveSysIdData();
+
+    runSysIdQuasistatic(false).schedule();
+    Timer.delay(5);
+    saveSysIdData();
+
+    runSysIdDynamic(true).schedule();
+    Timer.delay(5);
+    saveSysIdData();
+
+    runSysIdDynamic(false).schedule();
+    Timer.delay(5);
+    saveSysIdData();
+
+    arcadeDriveVolts(0, 0);
   }
 }
