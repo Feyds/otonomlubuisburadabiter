@@ -176,8 +176,7 @@ public Command createPathFollowingCommand(PathPlannerTrajectory trajectory) {
             PathPlannerTrajectoryState desiredState = trajectory.sample(currentTime);
 
            // Pose2d currentPose = getPose();
-
-            // Robotun şimdiki pozisyonu ile hedef pozisyon arasındaki farkı bul
+          
             ChassisSpeeds speeds = kinematics.toChassisSpeeds(
                 new DifferentialDriveWheelSpeeds(
                     desiredState.linearVelocity,
@@ -226,14 +225,10 @@ public Command createPathFollowingCommand(PathPlannerTrajectory trajectory) {
     double deltaTime = Timer.getFPGATimestamp() - lastTimeStamp;
     lastTimeStamp = Timer.getFPGATimestamp();
 
-    // Motor çıkışlarına dayalı tahmini hız belirleme
-    double estimatedSpeed = 1.0 * (leftFront.get() + rightFront.get()) / 2.0; // Buradaki katsayıyı ayarlayabilirsiniz.
+    double estimatedSpeed = 1.0 * (leftFront.get() + rightFront.get()) / 2.0;
 
-    // Gyro'dan açıyı al
     double headingRad = Math.toRadians(gyro.getAngle());
     Rotation2d rotation = new Rotation2d(headingRad);
-
-    // X ve Y tahminini güncelle (Dead Reckoning)
     estimatedX += estimatedSpeed * deltaTime * Math.cos(headingRad);
     estimatedY += estimatedSpeed * deltaTime * Math.sin(headingRad);
 
@@ -241,14 +236,11 @@ public Command createPathFollowingCommand(PathPlannerTrajectory trajectory) {
 }
 
   public void resetPose(Pose2d newPose) {
-    // Gyro'yu verilen pozisyon açısına sıfırla
     gyro.setAngleAdjustment(newPose.getRotation().getDegrees());
 
-    // X ve Y pozisyonlarını sıfırla
     estimatedX = newPose.getX();
     estimatedY = newPose.getY();
 
-    // Son zaman damgasını sıfırla
     lastTimeStamp = Timer.getFPGATimestamp();
 
     Logger.recordOutput("DriveTrain", "Pozisyon sıfırlandı: " + newPose);
