@@ -69,6 +69,7 @@ public class Robot extends LoggedRobot {
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
         Logger.addDataReceiver(new NT4Publisher());
+        Logger.addDataReceiver(new WPILOGWriter("src/main/deploy/logs"));
         break;
 
       case SIM:
@@ -172,7 +173,7 @@ public class Robot extends LoggedRobot {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
 
-    driveTrain.runSysId();
+  //  driveTrain.runSysId();
   }
 
   /** This function is called periodically during test mode. */

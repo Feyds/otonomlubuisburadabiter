@@ -18,7 +18,8 @@ public class AutoChooser {
     public static void init() {
         chooser.setDefaultOption("Ileri git", "Task1");
         chooser.addOption("Ileri git ve saga dön", "Task2");
-        chooser.addOption("Otonom", "Task3");
+        chooser.addOption("CALISTIRMA!!!", "Task3");
+        chooser.addOption("Otonom deneme", "Task4");
 
         SmartDashboard.putData("Auto Chooser", chooser);
     }
@@ -32,6 +33,8 @@ public class AutoChooser {
                 return new Task2();
             case "Task3":
                 return new Task3();
+            case "Task4":
+                return new Task4();
             default:
                 return new Task1();
         }
