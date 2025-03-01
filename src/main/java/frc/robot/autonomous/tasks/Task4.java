@@ -15,12 +15,10 @@ public class Task4 implements AutoTask {
     DriveTrain drive = DriveTrain.getInstance();
 
     AHRS navx = new AHRS(NavXComType.kMXP_SPI);
-    PIDController turnController = new PIDController(0, 0, 0);  //TODO: PID DEĞERLERİ AYARLANACAK
-    PIDController distanceController = new PIDController(0, 0, 0);
+    PIDController turnController = new PIDController(0.02, 0.0001, 0.002);  //TODO: PID DEĞERLERİ AYARLANACAK
+    PIDController distanceController = new PIDController(0.1, 0.0005, 0.01);
 
-    double angleSetpoint = 0;
-    double distanceSetpoint = 0;
-    double initYaw = 0;
+    double angleSetpoint, distanceSetpoint, initYaw;
 
     public Task4() {
         navx.reset();
