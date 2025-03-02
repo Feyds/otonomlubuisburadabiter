@@ -11,7 +11,14 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.autonomous.AutoChooser;
@@ -35,14 +42,24 @@ public class Robot extends LoggedRobot {
   Algae algae = Algae.getInstance();
   Driver driver = new Driver(Constants.kControllerPort);
 
+  PowerDistribution pdp = new PowerDistribution(1, ModuleType.kRev);
+  NetworkTableEntry pdpVoltage;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
   public Robot() {
-    // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-    // autonomous chooser on the dashboard.
     AutoChooser.init();
+
+    NetworkTableInstance instance = NetworkTableInstance.getDefault();
+    NetworkTable table = instance.getTable("PDP");
+    pdpVoltage = table.getEntry("Voltage");
+    
+    CameraServer.startAutomaticCapture();
+    UsbCamera camera = CameraServer.startAutomaticCapture(0);
+    //camera.setResolution(320, 240);
+    camera.setFPS(30);
 
         // Record metadata
     Logger.recordMetadata("ProjectName", Constants.MAVEN_NAME);
@@ -114,6 +131,9 @@ public class Robot extends LoggedRobot {
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
+
+    double voltage = pdp.getVoltage();
+    pdpVoltage.setDouble(voltage);
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -190,4 +210,3 @@ public class Robot extends LoggedRobot {
     driveTrain.updatePosition(driver.getSpeed(), driver.getRotation());
     }
   }
-
